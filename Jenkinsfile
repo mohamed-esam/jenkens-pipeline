@@ -15,16 +15,16 @@ pipeline {
                   sh 'tidy -q -e *.html'
               }
          }
-        /* stage('Security Scan') {
+         stage('Security Scan') {
               steps { 
-                 aquaMicroscanner imageName:'alpine:latest', notCompliesCmd:'exit 1', onDisallowed: 'fail', outputFormat: 'html'
+                 aquaMicroscanner imageName: 'alpine:latest', notCompleted: 'exit 1', onDisallowed: 'fail'
               }
-         }         */
+         }         
          stage('Upload to AWS') {
               steps {
-                   withAWS(region: 'us-east-2', credentials: 'devopsroot') {
-                        sh 'echo "Uploading content with AWS creds"'
-                        s3Upload(pathStyleAccessEnabled: true, excludePathPattern : '*Jenkins*', includePathPattern : '*.html, css/*, img/*, vendor/**, __MACOSX/**', bucket: 'batram-static-pipeline')
+                  withAWS(region:'us-east-2',credentials:'aws-static') {
+                  sh 'echo "Uploading content with AWS creds"'
+                      s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'static-jenkins-pipeline')
                   }
               }
          }
